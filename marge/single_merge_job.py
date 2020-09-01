@@ -16,7 +16,7 @@ class SingleMergeJob(MergeJob):
         super().__init__(api=api, user=user, project=project, repo=repo, options=options)
         self._merge_request = merge_request
 
-    def execute(self):
+    def execute(self, attempt=0):
         merge_request = self._merge_request
 
         log.info('Processing !%s - %r', merge_request.iid, merge_request.title)
@@ -28,10 +28,16 @@ class SingleMergeJob(MergeJob):
         except SkipMerge as err:
             log.warning("Skipping MR !%s: %s", merge_request.info['iid'], err.reason)
         except CannotMerge as err:
-            message = "I couldn't merge this branch: %s" % err.reason
-            log.warning(message)
-            self.unassign_from_mr(merge_request)
-            merge_request.comment(message)
+            # For some reason gitlab now randomly refuses the first time.
+            if attempt == 0:
+                log.warning("Retrying, gitlab refused: %s", err.reason)
+                self.execute(attempt+1)
+            else:
+                message = "Attempt %d: I couldn't merge this branch: %s" % (
+                    attempt+1, err.reason)
+                log.warning(message)
+                self.unassign_from_mr(merge_request)
+                merge_request.comment(message)
         except git.GitError:
             log.exception('Unexpected Git error')
             merge_request.comment('Something seems broken on my local git repo; check my logs!')
