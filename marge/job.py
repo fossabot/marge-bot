@@ -183,7 +183,10 @@ class MergeJob(object):
             log.debug('Waiting for %s secs before polling CI status again', waiting_time_in_secs)
             time.sleep(waiting_time_in_secs)
 
-        raise CannotMerge('CI is taking too long.')
+        if self._options.ci_timeout_skip:
+            raise SkipMerge('CI is taking too long.')
+        else:
+            raise CannotMerge('CI is taking too long.')
 
     def unassign_from_mr(self, merge_request):
         log.info('Unassigning from MR !%s', merge_request.iid)
@@ -351,6 +354,7 @@ JOB_OPTIONS = [
     # bool - If true, require not just that a CI passed, but a CI run by marge.
     # Start one if necessary.
     'require_ci_run_by_me',
+    'ci_timeout_skip',
 ]
 
 
@@ -365,7 +369,7 @@ class MergeJobOptions(namedtuple('MergeJobOptions', JOB_OPTIONS)):
     def default(
             cls, *,
             add_tested=False, add_part_of=False, add_reviewers=False, reapprove=False,
-            approval_timeout=None, embargo=None, ci_timeout=None,
+            approval_timeout=None, embargo=None, ci_timeout=None, ci_timeout_skip=False,
             merge_strategy=MergeStrategy.rebase,
             require_ci_run_by_me=False,
     ):
@@ -380,6 +384,7 @@ class MergeJobOptions(namedtuple('MergeJobOptions', JOB_OPTIONS)):
             approval_timeout=approval_timeout,
             embargo=embargo,
             ci_timeout=ci_timeout,
+            ci_timeout_skip=ci_timeout_skip,
             merge_strategy=merge_strategy,
             require_ci_run_by_me=require_ci_run_by_me,
         )
