@@ -173,10 +173,8 @@ class MergeJob(object):
                 raise CannotMerge('Someone canceled the CI.')
 
             if ci_status is None and ci_run_by_me:
-                log.info('Starting a CI in my name')
-                pipeline = Pipeline.start(
-                    merge_request.source_project_id, merge_request.source_branch, self._api)
-                log.info('Started pipeline %s', pipeline.id)
+                log.warning(f'CI not found for MR !{merge_request.iid}. Related to issue #10837? Refusing to start a duplicate pipeline.')
+
             elif ci_status not in ('pending', 'running', 'created'):
                 log.warning('Suspicious CI status: %r', ci_status)
 
