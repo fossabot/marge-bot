@@ -154,8 +154,18 @@ class Bot(object):
             except git.GitError as err:
                 log.exception('BatchMergeJob failed: %s', err)
         elif not self._config.skip_pending:
-            log.info('Attempting to merge the oldest MR...')
-            merge_request = merge_requests[0]
+            merge_request = None
+            if self._config.priority_labels:
+                priority = [
+                    mr for mr in merge_requests
+                    if all(label in mr.info['labels'] for label in self._config.priority_labels)
+                ]
+                if priority:
+                    log.info('Attempting to merge priority MR...')
+                    merge_request = priority[0]
+            if not merge_request:
+                log.info('Attempting to merge the oldest MR...')
+                merge_request = merge_requests[0]
             merge_job = self._get_single_job(
                 project=project, merge_request=merge_request, repo=repo,
                 options=self._config.merge_opts,
@@ -183,7 +193,7 @@ class Bot(object):
 
 class BotConfig(namedtuple('BotConfig',
                            'user ssh_key_file project_regexp merge_opts git_timeout ' +
-                           'git_reference_repo branch_regexp batch skip_pending')):
+                           'git_reference_repo branch_regexp batch skip_pending priority_labels')):
     pass
 
 

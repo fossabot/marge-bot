@@ -225,6 +225,11 @@ def _parse_config(args):
         action='store_true',
         help='Skip to next MR if oldest MR is not ready (otherwise, wait until it is)'
     )
+    parser.add_argument(
+        '--priority-labels',
+        default='',
+        help='Comma-separated labels, if all are present promote an MR to the front of the queue.',
+    )
     config = parser.parse_args(args)
 
     if config.use_merge_strategy:
@@ -336,6 +341,7 @@ def main(args=None):
                 ),
                 batch=options.batch,
                 skip_pending=options.skip_pending,
+                priority_labels=options.priority_labels.split(','),
             )
 
             marge_bot = bot.Bot(api=api, config=config)
