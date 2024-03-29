@@ -1,4 +1,5 @@
 [![build status](https://travis-ci.org/smarkets/marge-bot.png?branch=master)](https://travis-ci.org/smarkets/marge-bot)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgroq%2Fmarge-bot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgroq%2Fmarge-bot?ref=badge_shield)
 
 # Marge-bot
 
@@ -487,3 +488,7 @@ whitelist `marge-bot`'s email.
 Some versions of GitLab are not good at reporting merge failures due to hooks
 (the REST API may even claim the merge operation succeeded), you can find
 this in `gitlab-rails/githost.log`, under GitLab's logs directory.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgroq%2Fmarge-bot.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgroq%2Fmarge-bot?ref=badge_large)
